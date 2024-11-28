@@ -2,11 +2,13 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles    # 静态文件夹的挂在和访问
 from BlogRouter.BlogImager import BlogImageRouter
 from middleware import MiddleWare     # 导入自定义的中间件类
+from settings import DeBug
 import uvicorn
 
 app = FastAPI(
         docs_url=None,  # 禁用 Swagger UI
-        redoc_url=None  # 禁用 ReDoc
+        redoc_url=None, # 禁用 ReDoc
+        debug=DeBug
     )
 
 if __name__ == "__main__":

@@ -72,6 +72,7 @@ class Imager():
         }
         try:
             image_name = self.create_image_name(image)
+            print('image size',image.size)
             if image_name:
                 to_save_image_path = self.create_image_full_path()
                 if to_save_image_path:   # 小型图片 比如只有 kb或者 MB 大小可以使用下面的方式存储，如果是大文件，建议利用 aiofiles 去做文件切块处理
@@ -90,6 +91,7 @@ class Imager():
                 saved_result['message'] = f'failed to saved current image, error: target image type [{image.content_type}] is not supported !'
                 return saved_result
         except Exception  as err:
+            print('there were an error when saving image ',err)
             #  这里会添加对应的日志 打印 功能
             saved_result['message'] = f'failed to saved current image, error: {err}'
             return saved_result

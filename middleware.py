@@ -20,6 +20,7 @@ class MiddleWare(BaseHTTPMiddleware):
         print('origin',origin)
         print('x_forwarded_for',x_forwarded_for)
         print('host',request.headers.get('host'))
+        
         # 请求头验证通过，继续处理请求
         response = await call_next(request)
         return response

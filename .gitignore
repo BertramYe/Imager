@@ -3,3 +3,4 @@ static/blog/blog_detail/*
 static/blog/user_avater/*
 __pycache__
 deployment
+BlogRouter/__pycache__

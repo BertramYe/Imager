@@ -1,15 +1,21 @@
 from starlette.middleware.base import BaseHTTPMiddleware, DispatchFunction,RequestResponseEndpoint
 from starlette.types import ASGIApp
 from starlette.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 
 
 
 
 
-
-class MiddleWare(BaseHTTPMiddleware):
+class MiddleWare(CORSMiddleware):
     def __init__(self,app:ASGIApp) -> None:
-        super().__init__(app)
+        super().__init__(app,
+                            allow_origins=["*"],  # 您可以指定允许的域名列表
+                            allow_credentials=True,  # 是否允许跨域请求携带凭据（如 cookies、HTTP认证信息或客户端证书）。如果设置为 True，浏览器将会在跨域请求中携带凭据。如果设置为 False，则不会允许在跨域请求中携带凭据。
+                            # allow_methods=["*"],  # 允许所有方法
+                            allow_methods=["GET",'POST'],  # 允许所有方法
+                            allow_headers=["*"],  # 允许所有请求头
+                         )
 
     
     async def dispatch(self, request, call_next:RequestResponseEndpoint):

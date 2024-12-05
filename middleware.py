@@ -20,7 +20,8 @@ class MiddleWare(CORSMiddleware):
     
     async def dispatch(self, request, call_next:RequestResponseEndpoint):
         try:
-            print('request',request.headers)
+            print('request',request)
+            print('headers',request.headers)
             origin = request.headers.get("origin") or request.headers.get("referer")
             # 获取 X-Forwarded-For 头部（可能包含多个 IP 地址）
             x_forwarded_for = request.headers.get("X-Forwarded-For")

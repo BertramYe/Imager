@@ -29,12 +29,15 @@ class MiddleWare(BaseHTTPMiddleware):
             # print('origin',origin)
             # print('x_forwarded_for',x_forwarded_for)
             # print('host',request.headers.get('host'))
-            print("Content-Type:", request.headers.get('Content-Type'))
+            content_type = request.headers.get('Content-Type')
+            print("Content-Type:", content_type)
+            print("Content-Type:", content_type.__len__())
+
             # body = await request.body() 
             # 请求头验证通过，继续处理请求
             response = await call_next(request)
             print('response',response.headers)
-            print('response',response.body)
+            
         except Exception as er:
             print('error',er)
         return response

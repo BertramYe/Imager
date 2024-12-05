@@ -21,7 +21,7 @@ class SaveImageReturnType():
 
 class Imager():
     def __init__(self,type:Literal['blog_detail','blog_user']) -> None:
-        self.filer = Filer
+        self.filer = Filer()
         self.image_type:Literal['blog_detail','blog_user'] = type
         self.avalable_image_type = {
             'image/png':'png',         # png 图片

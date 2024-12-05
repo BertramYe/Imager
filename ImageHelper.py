@@ -4,10 +4,9 @@ from fastapi import UploadFile
 from typing import Literal,Optional
 from datetime import datetime
 from uuid import uuid4
-from os import path,makedirs
 from shutil import copyfileobj
 from settings import Image_Type
-
+from FileHelper import Filer
 # class ImagerFormModule(BaseModel):
 #     #  定义一个Image 的模型，用于图片的验证
 #     type:str
@@ -22,6 +21,7 @@ class SaveImageReturnType():
 
 class Imager():
     def __init__(self,type:Literal['blog_detail','blog_user']) -> None:
+        self.filer = Filer
         self.image_type:Literal['blog_detail','blog_user'] = type
         self.avalable_image_type = {
             'image/png':'png',         # png 图片
@@ -31,6 +31,7 @@ class Imager():
             'image/bmp':'bmp',    # bmp 图片
         }
         self.allow_image_type = Image_Type
+        
     
     def create_image_name(self,image:UploadFile):
         if image.content_type in self.avalable_image_type:
@@ -45,21 +46,22 @@ class Imager():
     
     def create_image_full_path(self) -> Optional[str]:
         base_path  = None
-        match self.image_type:
-            case 'blog_detail':
-                base_path = 'static/blog/blog_detail'   # 使用相对路径表示
-            case 'blog_user':
-                base_path = 'static/blog/user_avater'
-            case _:
-                base_path = None
-        if base_path:
-            current_date = datetime.now()
-            formatted_date = current_date.strftime("%Y/%m/%d")
-            to_save_image_path = f"{base_path}/{formatted_date}"
-            if not path.exists(to_save_image_path):
-                # 如果文件夹不存在，创建文件夹
-                makedirs(to_save_image_path)
-            return to_save_image_path
+        static_path = self.filer.static_path
+        if static_path:
+            match self.image_type:
+                case 'blog_detail':
+                    base_path = f'{static_path}blog/blog_detail'   # 使用相对路径表示
+                case 'blog_user':
+                    base_path = f'{static_path}blog/user_avater'
+                case _:
+                    base_path = None
+            if base_path:
+                current_date = datetime.now()
+                formatted_date = current_date.strftime("%Y/%m/%d")
+                to_save_image_path = f"{base_path}/{formatted_date}"
+                return self.filer.check_and_create_path(to_save_image_path,True)
+            else:
+                return None
         else:
             return None
 

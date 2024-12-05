@@ -74,6 +74,9 @@ $ python3 -m venv imager_env
 # 激活虚拟环境 
 $ source imager_env/bin/activate
 
+# 安装所需安装包
+$ pip3 install fastapi "uvicorn[standard]" python-multipart -i https://pypi.tuna.tsinghua.edu.cn/simple
+
 #  退出虚拟环境
 $ deactivate
 

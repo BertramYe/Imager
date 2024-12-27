@@ -7,6 +7,7 @@ from uuid import uuid4
 from shutil import copyfileobj
 from settings import Image_Type
 from FileHelper import Filer
+from LoggerHelper import Logger
 # class ImagerFormModule(BaseModel):
 #     #  定义一个Image 的模型，用于图片的验证
 #     type:str
@@ -31,6 +32,7 @@ class Imager():
             'image/bmp':'bmp',    # bmp 图片
         }
         self.allow_image_type = Image_Type
+        self.logger = Logger()
         
     
     def create_image_name(self,image:UploadFile):
@@ -74,7 +76,6 @@ class Imager():
         }
         try:
             image_name = self.create_image_name(image)
-            print('image size',image.size)
             if image_name:
                 to_save_image_path = self.create_image_full_path()
                 if to_save_image_path:   # 小型图片 比如只有 kb或者 MB 大小可以使用下面的方式存储，如果是大文件，建议利用 aiofiles 去做文件切块处理
@@ -93,7 +94,7 @@ class Imager():
                 saved_result['message'] = f'failed to saved current image, error: target image type [{image.content_type}] is not supported !'
                 return saved_result
         except Exception  as err:
-            print('there were an error when saving image ',err)
+            self.logger.error(f'there were an error when saving image:error:{err}')
             #  这里会添加对应的日志 打印 功能
             saved_result['message'] = f'failed to saved current image, error: {err}'
             return saved_result

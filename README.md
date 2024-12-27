@@ -9,7 +9,7 @@
 ```bash
 
 # 创建虚拟开发环境
-$ pipenv --python 3.12.2
+$ pipenv --python 3.12.6
 
 # 启动开发环境
 $ pipenv shell 
@@ -63,7 +63,7 @@ $ pipx install fastapi "uvicorn[standard]" python-multipart
 因此，虽然 pipx 使用虚拟环境的概念，它更像是一个专注于隔离和管理 Python 命令行工具的工具。
 
 
-或者直接抛弃 `pipenv` 或者 `pipx` , 直接使用原始自带的 `venv` 创建虚拟环境`(推荐)`
+> 或者直接抛弃 `pipenv` 或者 `pipx` , 直接使用原始自带的 `venv` 创建虚拟环境`(推荐)`
 
 ```bash
 # 切换到home的指定项目目录下
@@ -82,53 +82,24 @@ $ deactivate
 
 ```
 
-
-
-
-
-# 创建第一个项目文件 `main.py`
-
-```python
-
-from typing import Union
-
-from fastapi import FastAPI
-
-app = FastAPI(
-    # 注意在生产环境中部署时，最好使用以下参数
-    docs_url=None,  # 禁用 Swagger UI
-    redoc_url=None  # 禁用 ReDoc
-)
-
-
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
-
-
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: Union[str, None] = None):
-    return {"item_id": item_id, "q": q}
-
-```
-
-
 # 配置参数
 
-最好创建对应的服务启动的配置文件,对于当前项目，配置文件，我都放在了 `settings.py` 这个文件夹里面
-
-
-
-
+最好创建对应的服务启动的配置文件,对于当前项目，配置文件，我都放在了 `settings.py` 这个文件夹里面，这里直接省略
 
 
 # 启动项目
 
 ## 1. 在开发和测试中启动
+
+以下命令终端关闭后，当前服务会停止
+
 ```bash
 #  reload 表示项目热更新
 #  默认端口 http://127.0.0.1:8000
 $ uvicorn main:app --reload
+#  或者手动
+$ uvicorn main:app --host 0.0.0.0 --port 8000
+
 
 # 当前项目测试时，只需要下面方式启动即可，另外需要注意，当前项目没有开启热更新，所以更新完代码需要手动重启
 $ python ./main.py   
@@ -137,18 +108,54 @@ $ python ./main.py
 
 ## 2. 在 项目中实际的部署
 
+以下命令即使关闭终端也不会停止
 
+```bash
+#  对于生产环境而言，如果项目不是特别复杂，可以使用以下命令让其在后台运行
+# nohup：nohup 是一个 Linux/Unix 命令，它的作用是忽略挂起信号（SIGHUP），从而使得命令在终端关闭后依然能够继续运行。通常用于在后台启动长期运行的进程。
+
+# 注意以下命令在运行时，会接受所有 代码中的 print 的打印结果，并放到 uvicorn.log 里面，而如果不想要这种结果，可以使用 logging 模块，自定义日志输出（比较推荐 logging，这也是我这么做的）
+
+# 如果以上设置了 logging 模块 进行当前项目的管理，此时下面的 uvicorn.log 就只会记录项目的启动和重启的记录，由于项目不会经常重启，所以不用关心以下项目文件的大小
+$ nohup uvicorn main:app --host 0.0.0.0 --port 8000 > ./Log/uvicorn.log &
+
+```
 
 # 在前端调用当前接口
 
 以下是一个前端的form表单的post提交实例如下,最主要的核心在于，表单在提交时，需要加上 `enctype="multipart/form-data"` 属性 :
 
 ```html
+    <!-- 以下是 POST 的使用 -->
     <form action="http://localhost:8000/blog/blog_detail/upload/" method="post"  enctype="multipart/form-data">
         <input type="file" name="image">
         <button type="submit"> submit </button>
     </form>
+
+    <!--  以下是GET 在 <img> 标签中的显示使用 -->
+    <img src="http://localhost:8000/static/blog/blog_detail/2024/11/28/4caf9be0-2098-4684-adec-17196b022991.png" alt="">
 ```
 
+如果是异步也可以使用 fetch 去做
 
+```ts
+  // 以下是 POST 方法，而对于 GET 方法，基本一样，这里暂时就省略了 
+  const form = new FormData();  
+  form.append('image',Image)  // 这里的Image是一个图片对象
+  const response = await fetch(`http://localhost:8000/blog/blog_detail/upload/`, {  // 对于hander 默认情况下，fetch 会自动添加
+                method: 'POST',
+                // headers: header, // 自动设置 multipart/form-data 头部
+                // headers:{
+                //     'Content-Type': contentType as string,
+                //     'User-Agent': userAgent as string,
+                // },
+                mode: 'cors',  // 执行跨域请求
+                body: form, // FormData 作为请求体
+                // headers:{
+                //     ...reqHeaders
+        // }
+});
+
+
+```
 

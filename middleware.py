@@ -1,11 +1,10 @@
 from starlette.middleware.base import BaseHTTPMiddleware, DispatchFunction,RequestResponseEndpoint
 from starlette.types import ASGIApp
 from starlette.responses import JSONResponse
-from fastapi.middleware.cors import CORSMiddleware
+from settings import Allow_Host,Running_Port
+from LoggerHelper import Logger
 
-
-
-
+#  当然以下为了访问安全，完全可以添加一个加密方法，对称加密即可, 详细可以在 CryptHelper.py 中去定义和调用
 
 class MiddleWare(BaseHTTPMiddleware):
     def __init__(self,app:ASGIApp,dispatch:DispatchFunction | None = None) -> None:
@@ -17,27 +16,30 @@ class MiddleWare(BaseHTTPMiddleware):
         #                     allow_headers=["*"],  # 允许所有请求头
         #                  )
         super().__init__(app,dispatch)
+        self.white_list = Allow_Host
+        self.logger = Logger()
 
-    
     async def dispatch(self, request, call_next:RequestResponseEndpoint):
         try:
-            # print('request',request)
-            print('headers',request.headers)
-            # origin = request.headers.get("origin") or request.headers.get("referer")
-            # # 获取 X-Forwarded-For 头部（可能包含多个 IP 地址）
-            # x_forwarded_for = request.headers.get("X-Forwarded-For")
-            # print('origin',origin)
-            # print('x_forwarded_for',x_forwarded_for)
-            # print('host',request.headers.get('host'))
-            content_type = request.headers.get('Content-Type')
-            print("Content-Type:", content_type)
-            print("Content-Type:", content_type.__len__())
-
-            # body = await request.body() 
-            # 请求头验证通过，继续处理请求
+            if request.url.port != Running_Port:  # 接口不被允许
+                self.logger.error(f'request from port  ({request.url.port}) not allowed, the allowed host please checking the settings.py of the config "Running_Port" ! ')
+                return JSONResponse(
+                    content= 'request not allowed, error type 1 !',
+                    status_code= 504
+                )
+            # '*' 代表允许所有的接口请求
+            if '*' not in self.white_list and request.url.hostname not in self.white_list:
+                self.logger.error(f'request from host ({request.url.hostname}) not allowed, the allowed host please checking the settings.py of the config "white_list" ! ')
+                return JSONResponse(
+                    content= 'request not allowed, error type 2',   # host 不被允许
+                    status_code= 504
+                )
             response = await call_next(request)
-            print('response',response.headers)
-            
+            return response
         except Exception as er:
-            print('error',er)
-        return response
+            self.logger.error(f'error in the MiddleWare, error: {er}') 
+            return JSONResponse(
+                    content= f'there were some errors in the server !!!',
+                    status_code= 505
+            )
+

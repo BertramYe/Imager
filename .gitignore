@@ -5,3 +5,4 @@ __pycache__
 deployment
 BlogRouter/__pycache__
 Log
+settings.py

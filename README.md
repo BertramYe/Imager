@@ -3,6 +3,14 @@
 
 简单说明一下，这是一个以 `fastAPI` 为主的 `图片` 项目存储的简单快速的接口
 
+> 备注一下，无论是 dev 还是 production 环境，在启动之前，请执行以下命令，配置好对应的 `settings.py` 的项目配置文件
+
+```bash
+# 复制和重命名当前以下的 settings-template.py 配置文件 
+$ cp settings-template.py settings.py
+
+```
+
 
 ## 1. dev 环境
 
@@ -119,6 +127,9 @@ $ python ./main.py
 # 如果以上设置了 logging 模块 进行当前项目的管理，此时下面的 uvicorn.log 就只会记录项目的启动和重启的记录，由于项目不会经常重启，所以不用关心以下项目文件的大小
 $ nohup uvicorn main:app --host 0.0.0.0 --port 8000 > ./Log/uvicorn.log &
 
+# 同时对于以上启动的项目，完全可以使用以下命令检查后，使用（在linux中）利用 kill 命令终止进程即可
+$ ps aux | grep uvicorn
+$ kill -9 [proccess_id]
 ```
 
 # 在前端调用当前接口
@@ -127,7 +138,7 @@ $ nohup uvicorn main:app --host 0.0.0.0 --port 8000 > ./Log/uvicorn.log &
 
 ```html
     <!-- 以下是 POST 的使用 -->
-    <form action="http://localhost:8000/blog/blog_detail/upload/" method="post"  enctype="multipart/form-data">
+    <form action="http://localhost:8000/blog/blog_content/upload/" method="post"  enctype="multipart/form-data">
         <input type="file" name="image">
         <button type="submit"> submit </button>
     </form>
@@ -142,7 +153,7 @@ $ nohup uvicorn main:app --host 0.0.0.0 --port 8000 > ./Log/uvicorn.log &
   // 以下是 POST 方法，而对于 GET 方法，基本一样，这里暂时就省略了 
   const form = new FormData();  
   form.append('image',Image)  // 这里的Image是一个图片对象
-  const response = await fetch(`http://localhost:8000/blog/blog_detail/upload/`, {  // 对于hander 默认情况下，fetch 会自动添加
+  const response = await fetch(`http://localhost:8000/blog/blog_content/upload/`, {  // 对于hander 默认情况下，fetch 会自动添加
                 method: 'POST',
                 // headers: header, // 自动设置 multipart/form-data 头部
                 // headers:{

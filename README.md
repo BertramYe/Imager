@@ -128,7 +128,7 @@ $ python ./main.py
 $ nohup uvicorn main:app --host 0.0.0.0 --port 8000 > ./Log/uvicorn.log &
 
 # 同时对于以上启动的项目，完全可以使用以下命令检查后，使用（在linux中）利用 kill 命令终止进程即可
-$ ps aux | grep uvicorn
+$ ps -aux | grep uvicorn
 $ kill -9 [proccess_id]
 ```
 

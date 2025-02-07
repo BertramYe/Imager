@@ -127,8 +127,11 @@ $ python ./main.py
 # 如果以上设置了 logging 模块 进行当前项目的管理，此时下面的 uvicorn.log 就只会记录项目的启动和重启的记录，由于项目不会经常重启，所以不用关心以下项目文件的大小
 $ nohup uvicorn main:app --host 0.0.0.0 --port 8000 > ./Log/uvicorn.log &
 
+# 由于本项目在 main.py 中已经完成了对应的配置，故而直接使用以下方式运行即可
+$ nohup python main.py > ./Log/uvicorn.log &
+
 # 同时对于以上启动的项目，完全可以使用以下命令检查后，使用（在linux中）利用 kill 命令终止进程即可
-$ ps -aux | grep uvicorn
+$ ps -aux | grep main.py
 $ kill -9 [proccess_id]
 ```
 
